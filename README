@@ -1,0 +1,67 @@
+TimeMachine is a simple module with a TimeMachine class that has several date
+manipulation methods you might find useful. It uses the datetime and calendar modules, 
+and if nothing else can provide pointers on how to do these calculations in your own code, 
+without using an external module. 
+
+This is not a complete work, and isn't meant to be exhaustive.  If you need
+that, use dateutil :) 
+
+Here are some usage examples from the doctests (which contain more examples as well)
+
+The examples assume you've already run 'from TimeMachine import TimeMachine'
+
+        >>> tm = TimeMachine()
+        >>> n = datetime.datetime(2010, 7, 5)    # a Monday
+        >>> tm.get_next_byday('Monday', n)
+        datetime.datetime(2010, 7, 12, 0, 0)
+
+        >>> tm = TimeMachine()
+        >>> n = datetime.datetime(2010, 7, 6)
+        >>> tm.get_previous_byday('Sunday', n)
+        datetime.datetime(2010, 7, 4, 0, 0)
+
+        >>> tm = TimeMachine()
+        >>> n = datetime.datetime(2010, 7, 9)
+        >>> tm.get_current_week_range(n)
+        (datetime.datetime(2010, 7, 4, 0, 0), datetime.datetime(2010, 7, 10, 0, 0))
+
+        >>> tm = TimeMachine()
+        >>> n = datetime.datetime(2010, 7, 5)
+        >>> tm.get_previous_week(n)
+        (datetime.datetime(2010, 6, 27, 0, 0), datetime.datetime(2010, 7, 3, 0, 0))
+
+        >>> tm = TimeMachine()
+        >>> n = datetime.datetime(2010, 7, 5)
+        >>> tm.get_next_week(n)
+        (datetime.datetime(2010, 7, 11, 0, 0), datetime.datetime(2010, 7, 17, 0, 0))
+
+        >>> tm = TimeMachine()
+        >>> n = datetime.datetime(2010, 7, 12)
+        >>> tm.get_current_month_range(n)
+        (datetime.datetime(2010, 7, 1, 0, 0), datetime.datetime(2010, 7, 31, 0, 0))
+
+        >>> tm = TimeMachine()
+        >>> n = datetime.datetime(2010, 7, 5)
+        >>> tm.get_previous_month(n)
+        (datetime.datetime(2010, 6, 1, 0, 0), datetime.datetime(2010, 6, 30, 0, 0))
+
+        >>> tm = TimeMachine()
+        >>> n = datetime.datetime(2010, 7, 5)
+        >>> tm.get_next_month(n)
+        (datetime.datetime(2010, 8, 1, 0, 0), datetime.datetime(2010, 8, 31, 0, 0))
+
+        >>> tm = TimeMachine()
+        >>> n = datetime.datetime(2010, 7, 5)
+        >>> tm.get_n_days_ago(n, 3)
+        datetime.datetime(2010, 7, 2, 0, 0)
+
+        >>> tm = TimeMachine()
+        >>> n = datetime.datetime(2010, 7, 5)
+        >>> tm.get_n_days_ahead(n, 2)
+        datetime.datetime(2010, 7, 7, 0, 0)
+
+        >>> tm = TimeMachine()
+        >>> n = '2010-07-05'
+        >>> tm.get_date_from_string(n, '%Y-%m-%d')
+        datetime.datetime(2010, 7, 5, 0, 0)
+
