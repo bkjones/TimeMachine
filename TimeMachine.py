@@ -79,11 +79,13 @@ class TimeMachine(object):
         >>> n = datetime.datetime(2010, 7, 9)
         >>> tm.get_current_week_range(n)
         (datetime.datetime(2010, 7, 4, 0, 0), datetime.datetime(2010, 7, 10, 0, 0))
-
+        >>> n = datetime.datetime(2010, 7, 11)
+        >>> tm.get_current_week_range(n)
+        (datetime.datetime(2010, 7, 11, 0, 0), datetime.datetime(2010, 7, 17, 0, 0))
         """
-        dow_start = int(datetime.datetime.strftime(currdate, '%w'))
-        if dow_start == 0:
-            week_start = dow_start
+        dow_start = datetime.datetime.strftime(currdate, '%w')
+        if dow_start == '0':
+            week_start = currdate
         else:
             week_start = self.get_previous_byday('Sunday', currdate)
 
@@ -135,9 +137,13 @@ class TimeMachine(object):
         >>> n = datetime.datetime(2010, 7, 5)
         >>> tm.get_next_week(n)
         (datetime.datetime(2010, 7, 11, 0, 0), datetime.datetime(2010, 7, 17, 0, 0))
+        >>> n = datetime.datetime(2010, 4, 25) # a sunday
+        >>> tm.get_next_week(n)
+        (datetime.datetime(2010, 5, 2, 0, 0), datetime.datetime(2010, 5, 8, 0, 0))
         """
-        dow_today = startdate.weekday()
-        days_until_sunday = 7 - (dow_today + 1) 
+        dow_today = int(datetime.datetime.strftime(startdate, '%w'))
+        days_until_sunday = 7 - ((dow_today + 7) % 7)
+        #days_until_sunday = 7 - (dow_today + 1) 
         sunday = startdate + datetime.timedelta(days=days_until_sunday)
         following_saturday = sunday + datetime.timedelta(days=6)
         next_week = (sunday, following_saturday)
