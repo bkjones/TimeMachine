@@ -8,8 +8,8 @@ class TimeMachine(object):
 
     def get_next_byday(self, daystring, startdate, fmt=None):
         """
-        Pass in a daystring like 'Monday' or 'Wednesday' and a start date, and this 
-        should return the date of the daystring following the startdate. If fmt is given, it 
+        Pass in a daystring like 'Monday' or 'Wednesday' and a start date, and this
+        should return the date of the daystring following the startdate. If fmt is given, it
         should be a strftime()-compatible format string.
 
         >>> tm = TimeMachine()
@@ -26,11 +26,11 @@ class TimeMachine(object):
         datetime.datetime(2010, 7, 20, 0, 0)
         """
 
-        # decimal number day of the week we're starting from. %w formats using Sunday as day 0. 
+        # decimal number day of the week we're starting from. %w formats using Sunday as day 0.
         dow_start = int(datetime.datetime.strftime(startdate, '%w'))
 
 
-        # decimal number day of week we're trying to get. 
+        # decimal number day of week we're trying to get.
         dow_target = self.weekdays.index(daystring)
 
         # len - ((start + (len - target)) % len)
@@ -41,7 +41,7 @@ class TimeMachine(object):
 
     def get_previous_byday(self, daystring, startdate, fmt=None):
         """
-        Pass in a daystring and startdate, and this returns the date of the closest 
+        Pass in a daystring and startdate, and this returns the date of the closest
         daystring prior to startdate. If fmt is given, it should be a strftime()-compatible format string.
 
         >>> tm = TimeMachine()
@@ -59,12 +59,12 @@ class TimeMachine(object):
         >>> tm.get_previous_byday('Sunday', n)
         datetime.datetime(2010, 7, 4, 0, 0)
         """
-        # decimal number day of the week we're starting from. %w formats using Sunday as day 0. 
+        # decimal number day of the week we're starting from. %w formats using Sunday as day 0.
         dow_start = int(datetime.datetime.strftime(startdate, '%w'))
 
-        # decimal number day of week we're trying to get. 
+        # decimal number day of week we're trying to get.
         dow_target = self.weekdays.index(daystring)
-        
+
         days_back = 7 - ((dow_target + (7 - dow_start)) % 7)
 
         res = startdate - datetime.timedelta(days=days_back)
@@ -72,8 +72,8 @@ class TimeMachine(object):
 
     def get_current_week_range(self, currdate):
         """
-        Pass in a datetime object, returns a tuple of two datetime objects, 
-        representing the start/end dates of the week containing currdate. 
+        Pass in a datetime object, returns a tuple of two datetime objects,
+        representing the start/end dates of the week containing currdate.
 
         >>> tm = TimeMachine()
         >>> n = datetime.datetime(2010, 7, 9)
@@ -94,8 +94,8 @@ class TimeMachine(object):
 
     def get_previous_week(self, startdate):
         """
-        Pass in a datetime object, and get back a tuple of two 
-        datetime objects representing the start/end dates for the 
+        Pass in a datetime object, and get back a tuple of two
+        datetime objects representing the start/end dates for the
         whole week prior to the start date. Weeks start on Sun. and end on Sat.
         If fmt is given, it should be a strftime()-compatible format string.
 
@@ -108,13 +108,13 @@ class TimeMachine(object):
         >>> tm.get_previous_week(n)
         (datetime.datetime(2010, 6, 27, 0, 0), datetime.datetime(2010, 7, 3, 0, 0))
         """
-        # day 0 is Monday. Sunday is 6. 
+        # day 0 is Monday. Sunday is 6.
         dow_today = startdate.weekday()
 
         if dow_today == 6:
             days_ago_saturday = 1
         else:
-            # To get last saturday, we need to go to day 0 (Monday), then two more days. 
+            # To get last saturday, we need to go to day 0 (Monday), then two more days.
             days_ago_saturday = dow_today + 2
 
         # Make a timedelta object so we can do date arithmetic.
@@ -123,7 +123,7 @@ class TimeMachine(object):
         saturday = startdate - delta_saturday
         # timedelta object representing '6 days'...
         delta_prevsunday = datetime.timedelta(days=6)
-        # Making a date object. Subtract the 6 days from saturday to get "the Sunday before that". 
+        # Making a date object. Subtract the 6 days from saturday to get "the Sunday before that".
         prev_sunday = saturday - delta_prevsunday
 
         last_week = (prev_sunday, saturday)
@@ -131,7 +131,7 @@ class TimeMachine(object):
 
     def get_next_week(self, startdate):
         """
-        Just like get_previous_week... 
+        Just like get_previous_week...
 
         >>> tm = TimeMachine()
         >>> n = datetime.datetime(2010, 7, 5)
@@ -143,7 +143,7 @@ class TimeMachine(object):
         """
         dow_today = int(datetime.datetime.strftime(startdate, '%w'))
         days_until_sunday = 7 - ((dow_today + 7) % 7)
-        #days_until_sunday = 7 - (dow_today + 1) 
+        #days_until_sunday = 7 - (dow_today + 1)
         sunday = startdate + datetime.timedelta(days=days_until_sunday)
         following_saturday = sunday + datetime.timedelta(days=6)
         next_week = (sunday, following_saturday)
@@ -151,9 +151,9 @@ class TimeMachine(object):
 
     def get_current_month_range(self, currdate):
         """
-        Pass a datetime object for currdate and get back a tuple with two 
+        Pass a datetime object for currdate and get back a tuple with two
         datetime objects, representing the start and end dates of the month
-        that currdate is contained within. 
+        that currdate is contained within.
 
         >>> tm = TimeMachine()
         >>> n = datetime.datetime(2010, 7, 12)
@@ -170,8 +170,8 @@ class TimeMachine(object):
 
     def get_previous_month(self, startdate):
         """
-        Pass a datetime object for startdate, and get back a tuple with two 
-        datetime objects, representing the start/end dates of the month before 
+        Pass a datetime object for startdate, and get back a tuple with two
+        datetime objects, representing the start/end dates of the month before
         startdate. If fmt is given, it should be a strftime()-compatible format string.
 
         >>> tm = TimeMachine()
@@ -188,7 +188,7 @@ class TimeMachine(object):
 
     def get_next_month(self, startdate, fmt=None):
         """
-        Just like 'get_previous_month'... 
+        Just like 'get_previous_month'...
 
         >>> tm = TimeMachine()
         >>> n = datetime.datetime(2010, 7, 5)
@@ -204,8 +204,8 @@ class TimeMachine(object):
 
     def get_n_days_ago(self, startdate, n):
         """
-        Pass in a datetime object for startdate, and an integer n, and get back 
-        a datetime object for the date n days prior to startdate. 
+        Pass in a datetime object for startdate, and an integer n, and get back
+        a datetime object for the date n days prior to startdate.
 
         >>> tm = TimeMachine()
         >>> n = datetime.datetime(2010, 7, 5)
@@ -216,7 +216,7 @@ class TimeMachine(object):
 
     def get_n_days_ahead(self, startdate, n, fmt=None):
         """
-        Just like get_n_days_ago, but goes forward instead of back. 
+        Just like get_n_days_ago, but goes forward instead of back.
 
         >>> tm = TimeMachine()
         >>> n = datetime.datetime(2010, 7, 5)
@@ -227,7 +227,7 @@ class TimeMachine(object):
 
     def get_date_from_string(self, datestr, fmt):
         """
-        Given a string and format string, return a datetime object. 
+        Given a string and format string, return a datetime object.
 
         >>> tm = TimeMachine()
         >>> n = '2010-07-05'
@@ -236,12 +236,54 @@ class TimeMachine(object):
         """
         return datetime.datetime.strptime(datestr, fmt)
 
+    def get_period_range(self, period, start, end):
+        """
+        Given a start date, end date, and period type ('week' or 'month' right now),
+        return a list of tuples which contain the start and end dates of each period
+        in the range (start date, end date).
+
+        >>> tm = TimeMachine()
+        >>> s = '2010-07-05'
+        >>> e = '2010-11-05'
+        >>> tm.get_period_range('month', s, e)
+        [(datetime.datetime(2010, 7, 1, 0, 0), datetime.datetime(2010, 7, 31, 0, 0)), (datetime.datetime(2010, 8, 1, 0, 0), datetime.datetime(2010, 8, 31, 0, 0)), (datetime.datetime(2010, 9, 1, 0, 0), datetime.datetime(2010, 9, 30, 0, 0)), (datetime.datetime(2010, 10, 1, 0, 0), datetime.datetime(2010, 10, 31, 0, 0)), (datetime.datetime(2010, 11, 1, 0, 0), datetime.datetime(2010, 11, 30, 0, 0))]
+        >>> s = '2010-01-01'
+        >>> e = '2010-01-30'
+        >>> tm.get_period_range('week', s, e)
+        [(datetime.datetime(2009, 12, 27, 0, 0), datetime.datetime(2010, 1, 2, 0, 0)), (datetime.datetime(2010, 1, 3, 0, 0), datetime.datetime(2010, 1, 9, 0, 0)), (datetime.datetime(2010, 1, 10, 0, 0), datetime.datetime(2010, 1, 16, 0, 0)), (datetime.datetime(2010, 1, 17, 0, 0), datetime.datetime(2010, 1, 23, 0, 0)), (datetime.datetime(2010, 1, 24, 0, 0), datetime.datetime(2010, 1, 30, 0, 0))]
+        """
+        if not isinstance(start, datetime.datetime):
+            start = self.get_date_from_string(start, '%Y-%m-%d')
+        if not isinstance(end, datetime.datetime):
+            end = self.get_date_from_string(end, '%Y-%m-%d')
+
+        if period == 'month':
+            get_period = self.get_current_month_range
+            get_next_period = self.get_next_month
+        if period == 'week':
+            get_period = self.get_current_week_range
+            get_next_period = self.get_next_week
+
+        returnvals = []
+
+
+        firstper = get_period(start)
+        returnvals.append(firstper)
+        per = firstper
+        while per[1] < end:
+            # goes as long as the *end* of the period is < our end date.
+            # the intent is that if end is 2010-10-04, the last period will be
+            # (2010-10-01, 2010-10-31)
+            per = get_next_period(per[1])
+            returnvals.append(per)
+
+        return returnvals
+
+
+
+def _test():
+    import doctest
+    doctest.testmod()
+
 if __name__ == "__main__":
-    tm = TimeMachine()
-    n = datetime.datetime(2010, 7, 5)
-    print "Input: ", n
-    tm.get_next_byday('Monday', n)
-    tm.get_next_byday('Sunday', n)
-    n = datetime.datetime(2010, 7, 13)
-    print "Input: ", n
-    tm.get_next_byday('Wednesday', n)
+    _test()
