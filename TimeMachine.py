@@ -1,5 +1,6 @@
 import datetime
 import calendar
+import operator
 
 class TimeMachine(object):
     def __init__(self):
@@ -236,7 +237,7 @@ class TimeMachine(object):
         """
         return datetime.datetime.strptime(datestr, fmt)
 
-    def get_period_range(self, period, start, end):
+    def get_period_range(self, period, start, end, inclusive_start=True, inclusive_end=True):
         """
         Given a start date, end date, and period type ('week' or 'month' right now),
         return a list of tuples which contain the start and end dates of each period
@@ -251,6 +252,31 @@ class TimeMachine(object):
         >>> e = '2010-01-30'
         >>> tm.get_period_range('week', s, e)
         [(datetime.datetime(2009, 12, 27, 0, 0), datetime.datetime(2010, 1, 2, 0, 0)), (datetime.datetime(2010, 1, 3, 0, 0), datetime.datetime(2010, 1, 9, 0, 0)), (datetime.datetime(2010, 1, 10, 0, 0), datetime.datetime(2010, 1, 16, 0, 0)), (datetime.datetime(2010, 1, 17, 0, 0), datetime.datetime(2010, 1, 23, 0, 0)), (datetime.datetime(2010, 1, 24, 0, 0), datetime.datetime(2010, 1, 30, 0, 0))]
+        >>> s = '2010-07-05'
+        >>> e = '2010-11-05'
+        >>> tm.get_period_range('month', s, e, inclusive_start=False)
+        [(datetime.datetime(2010, 8, 1, 0, 0), datetime.datetime(2010, 8, 31, 0, 0)), (datetime.datetime(2010, 9, 1, 0, 0), datetime.datetime(2010, 9, 30, 0, 0)), (datetime.datetime(2010, 10, 1, 0, 0), datetime.datetime(2010, 10, 31, 0, 0)), (datetime.datetime(2010, 11, 1, 0, 0), datetime.datetime(2010, 11, 30, 0, 0))]
+        >>> s = '2010-07-05'
+        >>> e = '2010-11-05'
+        >>> tm.get_period_range('month', s, e, inclusive_end = False)
+        [(datetime.datetime(2010, 7, 1, 0, 0), datetime.datetime(2010, 7, 31, 0, 0)), (datetime.datetime(2010, 8, 1, 0, 0), datetime.datetime(2010, 8, 31, 0, 0)), (datetime.datetime(2010, 9, 1, 0, 0), datetime.datetime(2010, 9, 30, 0, 0)), (datetime.datetime(2010, 10, 1, 0, 0), datetime.datetime(2010, 10, 31, 0, 0))]
+        >>> s = '2010-07-05'
+        >>> e = '2010-11-05'
+        >>> tm.get_period_range('month', s, e, inclusive_end=False, inclusive_start=False)
+        [(datetime.datetime(2010, 8, 1, 0, 0), datetime.datetime(2010, 8, 31, 0, 0)), (datetime.datetime(2010, 9, 1, 0, 0), datetime.datetime(2010, 9, 30, 0, 0)), (datetime.datetime(2010, 10, 1, 0, 0), datetime.datetime(2010, 10, 31, 0, 0))]
+        >>> s = '2010-01-01'
+        >>> e = '2010-01-30'
+        >>> tm.get_period_range('week', s, e, inclusive_start=False)
+        [(datetime.datetime(2010, 1, 3, 0, 0), datetime.datetime(2010, 1, 9, 0, 0)), (datetime.datetime(2010, 1, 10, 0, 0), datetime.datetime(2010, 1, 16, 0, 0)), (datetime.datetime(2010, 1, 17, 0, 0), datetime.datetime(2010, 1, 23, 0, 0)), (datetime.datetime(2010, 1, 24, 0, 0), datetime.datetime(2010, 1, 30, 0, 0))]
+        >>> s = '2010-01-01'
+        >>> e = '2010-01-30'
+        >>> tm.get_period_range('week', s, e, inclusive_end=False)
+        [(datetime.datetime(2009, 12, 27, 0, 0), datetime.datetime(2010, 1, 2, 0, 0)), (datetime.datetime(2010, 1, 3, 0, 0), datetime.datetime(2010, 1, 9, 0, 0)), (datetime.datetime(2010, 1, 10, 0, 0), datetime.datetime(2010, 1, 16, 0, 0)), (datetime.datetime(2010, 1, 17, 0, 0), datetime.datetime(2010, 1, 23, 0, 0))]
+        >>> s = '2010-01-01'
+        >>> e = '2010-01-30'
+        >>> tm.get_period_range('week', s, e, inclusive_start=False, inclusive_end=False)
+        [(datetime.datetime(2010, 1, 3, 0, 0), datetime.datetime(2010, 1, 9, 0, 0)), (datetime.datetime(2010, 1, 10, 0, 0), datetime.datetime(2010, 1, 16, 0, 0)), (datetime.datetime(2010, 1, 17, 0, 0), datetime.datetime(2010, 1, 23, 0, 0))]
+
         """
         if not isinstance(start, datetime.datetime):
             start = self.get_date_from_string(start, '%Y-%m-%d')
@@ -260,9 +286,29 @@ class TimeMachine(object):
         if period == 'month':
             get_period = self.get_current_month_range
             get_next_period = self.get_next_month
+            get_previous_period = self.get_previous_month
         if period == 'week':
             get_period = self.get_current_week_range
             get_next_period = self.get_next_week
+            get_previous_period = self.get_previous_week
+
+        #####################
+        # inclusive_start means that the result set will include the whole period
+        # containing the start date. Likewise for inclusive_end.
+        #
+        # If you are, say, reporting on a 'last completed month' or something,
+        # but your report date (and end date) is mid-month or something, then setting 'inclusive_end'
+        # to False will insure that the report ends with the month prior to the
+        # end date.
+        #
+        # If you're doing projections starting with the month following the one
+        # you're in, setting inclusive_start to False will insure that the first
+        # period in the range is the one *after* the period you're in now.
+        #######################
+        if not inclusive_start:
+            start = get_next_period(start)[0]
+        if not inclusive_end:
+            end = get_previous_period(end)[1]
 
         returnvals = []
 
